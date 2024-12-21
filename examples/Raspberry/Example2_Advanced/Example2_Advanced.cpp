@@ -140,6 +140,13 @@ int main(){
 
  
   std::cout<<"Configuration complete!"<<std::endl;
+
+
+  // loop to get data
+  while(true){
+    loop();
+  }
+  
 }
 
 
