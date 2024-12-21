@@ -1,14 +1,12 @@
 /****************************************************************
- * Example2_Advanced.ino
- * ICM 20948 Arduino Library Demo
- * Shows how to use granular configuration of the ICM 20948
- * Owen Lyke @ SparkFun Electronics
- * Original Creation Date: April 17 2019
- *
- * Please see License.md for the license information.
- *
- * Distributed as-is; no warranty is given.
+ * Example1_Basics.cpp
+ * Modified by Srikanth Popuri 
+ * Original code by Owen Lyke @ SparkFun Electronics
+ * Based on SparkFun ICM-20948 library (MIT License)
+ * 
+ * See LICENSE.md for full licensing information.
  ***************************************************************/
+
 #include "ICM_20948.h" // Click here to get the library: http://librarymanager/All#SparkFun_ICM_20948_IMU
 
 ICM_20948_SPI myICM; // If using SPI create an ICM_20948_SPI object

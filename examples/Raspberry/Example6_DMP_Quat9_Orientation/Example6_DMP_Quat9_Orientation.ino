@@ -1,10 +1,11 @@
 /****************************************************************
- * Example6_DMP_Quat9_Orientation.ino
- * ICM 20948 Arduino Library Demo
+ * Example6_DMP_Quat9_Orientation.cpp
+ * ICM 20948 Raspberry Pi Demo
  * Initialize the DMP based on the TDK InvenSense ICM20948_eMD_nucleo_1.0 example-icm20948
- * Paul Clark, April 25th, 2021
+ * Srikanth Popuri (Author), April 25th, 2021
  * Based on original code by:
  * Owen Lyke @ SparkFun Electronics
+ * Paul Clark, April 25th, 2021
  * Original Creation Date: April 17 2019
  * 
  * ** This example is based on InvenSense's _confidential_ Application Note "Programming Sequence for DMP Hardware Functions".
@@ -27,88 +28,38 @@
 //#define QUAT_ANIMATION // Uncomment this line to output data in the correct format for ZaneL's Node.js Quaternion animation tool: https://github.com/ZaneL/quaternion_sensor_3d_nodejs
 
 #include "ICM_20948.h" // Click here to get the library: http://librarymanager/All#SparkFun_ICM_20948_IMU
-
-//#define USE_SPI       // Uncomment this to use SPI
-
-#define SERIAL_PORT Serial
-
-#define SPI_PORT SPI // Your desired SPI port.       Used only when "USE_SPI" is defined
-#define CS_PIN 2     // Which pin you connect CS to. Used only when "USE_SPI" is defined
-
-#define WIRE_PORT Wire // Your desired Wire port.      Used when "USE_SPI" is not defined
-// The value of the last bit of the I2C address.
-// On the SparkFun 9DoF IMU breakout the default is 1, and when the ADR jumper is closed the value becomes 0
-#define AD0_VAL 1
-
-#ifdef USE_SPI
+#include <cmath> 
 ICM_20948_SPI myICM; // If using SPI create an ICM_20948_SPI object
-#else
-ICM_20948_I2C myICM; // Otherwise create an ICM_20948_I2C object
-#endif
+
 
 void setup()
 {
 
-  SERIAL_PORT.begin(115200); // Start the serial console
-#ifndef QUAT_ANIMATION
-  SERIAL_PORT.println(F("ICM-20948 Example"));
-#endif
+  myICM.enableDebugging(); // Uncomment this line to enable helpful debug messages on Serial
 
-  delay(100);
-
-#ifndef QUAT_ANIMATION
-  while (SERIAL_PORT.available()) // Make sure the serial RX buffer is empty
-    SERIAL_PORT.read();
-
-  SERIAL_PORT.println(F("Press any key to continue..."));
-
-  while (!SERIAL_PORT.available()) // Wait for the user to press a key (send any serial character)
-    ;
-#endif
-
-#ifdef USE_SPI
-  SPI_PORT.begin();
-#else
-  WIRE_PORT.begin();
-  WIRE_PORT.setClock(400000);
-#endif
-
-#ifndef QUAT_ANIMATION
-  //myICM.enableDebugging(); // Uncomment this line to enable helpful debug messages on Serial
-#endif
 
   bool initialized = false;
   while (!initialized)
   {
 
-    // Initialize the ICM-20948
-    // If the DMP is enabled, .begin performs a minimal startup. We need to configure the sample mode etc. manually.
-#ifdef USE_SPI
-    myICM.begin(CS_PIN, SPI_PORT);
-#else
-    myICM.begin(WIRE_PORT, AD0_VAL);
-#endif
 
-#ifndef QUAT_ANIMATION
-    SERIAL_PORT.print(F("Initialization of the sensor returned: "));
-    SERIAL_PORT.println(myICM.statusString());
-#endif
-    if (myICM.status != ICM_20948_Stat_Ok)
-    {
-#ifndef QUAT_ANIMATION
-      SERIAL_PORT.println(F("Trying again..."));
-#endif
-      delay(500);
-    }
-    else
-    {
-      initialized = true;
-    }
+  const char *spiDevice = "/dev/spidev0.0";  // SPI device on Raspberry Pi
+  uint32_t SPIFreq = 7000000;  // SPI frequency set to 7 MHz
+  // Initialize the sensor with the SPI device and frequency
+  myICM.begin(spiDevice, SPIFreq);
+
+
+// Output the initialization result to the console
+  std::cout << "Initialization of the sensor returned: " << myICM.statusString() << std::endl;
+
+  // If the initialization was not successful, retry after a delay
+  if (myICM.status != ICM_20948_Stat_Ok) {
+      std::cout << "Trying again..." << std::endl;
+      usleep(500000);  // Delay for 500 milliseconds before retrying
   }
-
-#ifndef QUAT_ANIMATION
-  SERIAL_PORT.println(F("Device connected!"));
-#endif
+  else {
+      initialized = true;  // If initialized successfully, exit the loop
+  }
 
   bool success = true; // Use success to show if the DMP configuration was successful
 
@@ -167,17 +118,18 @@ void setup()
   // Check success
   if (success)
   {
-#ifndef QUAT_ANIMATION
-    SERIAL_PORT.println(F("DMP enabled!"));
-#endif
+
+    std::cout<<"DMP enabled!"<<std::endl;
+
   }
   else
   {
-    SERIAL_PORT.println(F("Enable DMP failed!"));
-    SERIAL_PORT.println(F("Please check that you have uncommented line 29 (#define ICM_20948_USE_DMP) in ICM_20948_C.h..."));
+    std::cout<<"Enable DMP failed!"<<std::endl;
+    std::cout<<"Please check that you have uncommented line 29 (#define ICM_20948_USE_DMP) in ICM_20948_C.h..."<<std::endl;
     while (1)
       ; // Do nothing more
   }
+}
 }
 
 void loop()
@@ -213,33 +165,22 @@ void loop()
       double q2 = ((double)data.Quat9.Data.Q2) / 1073741824.0; // Convert to double. Divide by 2^30
       double q3 = ((double)data.Quat9.Data.Q3) / 1073741824.0; // Convert to double. Divide by 2^30
       double q0 = sqrt(1.0 - ((q1 * q1) + (q2 * q2) + (q3 * q3)));
-
-#ifndef QUAT_ANIMATION
-      SERIAL_PORT.print(F("Q1:"));
-      SERIAL_PORT.print(q1, 3);
-      SERIAL_PORT.print(F(" Q2:"));
-      SERIAL_PORT.print(q2, 3);
-      SERIAL_PORT.print(F(" Q3:"));
-      SERIAL_PORT.print(q3, 3);
-      SERIAL_PORT.print(F(" Accuracy:"));
-      SERIAL_PORT.println(data.Quat9.Data.Accuracy);
-#else
       // Output the Quaternion data in the format expected by ZaneL's Node.js Quaternion animation tool
-      SERIAL_PORT.print(F("{\"quat_w\":"));
-      SERIAL_PORT.print(q0, 3);
-      SERIAL_PORT.print(F(", \"quat_x\":"));
-      SERIAL_PORT.print(q1, 3);
-      SERIAL_PORT.print(F(", \"quat_y\":"));
-      SERIAL_PORT.print(q2, 3);
-      SERIAL_PORT.print(F(", \"quat_z\":"));
-      SERIAL_PORT.print(q3, 3);
-      SERIAL_PORT.println(F("}"));
-#endif
+      std::cout<<"{\"quat_w\":";
+      std::cout<<q0;
+      std::cout<<", \"quat_x\":";
+      std::cout<<q1;
+      std::cout<<", \"quat_y\":";
+      std::cout<<q2;
+      std::cout<<", \"quat_z\":";
+      std::cout<<q3;
+      std::cout<<"}";
+
     }
   }
 
   if (myICM.status != ICM_20948_Stat_FIFOMoreDataAvail) // If more data is available then we should read it right away - and not delay
   {
-    delay(10);
+    usleep(10000);
   }
 }

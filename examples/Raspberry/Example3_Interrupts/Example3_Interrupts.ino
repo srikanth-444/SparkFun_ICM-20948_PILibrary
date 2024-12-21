@@ -1,16 +1,10 @@
 /****************************************************************
- * Example3_Interrupts.ino
- * ICM 20948 Arduino Library Demo
- * Builds on Example2_Advanced.ino to set up interrupts when data is ready
- * Owen Lyke @ SparkFun Electronics
- * Original Creation Date: June 5 2019
- *
- * For this example you must connect the interrupt pin "INT" on the breakout
- * board to the pin specified by "INT_PIN" on your microcontroller.
- *
- * Please see License.md for the license information.
- *
- * Distributed as-is; no warranty is given.
+ * Example1_Basics.cpp
+ * Modified by Srikanth Popuri 
+ * Original code by Owen Lyke @ SparkFun Electronics
+ * Based on SparkFun ICM-20948 library (MIT License)
+ * 
+ * See LICENSE.md for full licensing information.
  ***************************************************************/
 #include "ICM_20948.h" // Click here to get the library: http://librarymanager/All#SparkFun_ICM_20948_IMU
 
