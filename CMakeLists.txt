@@ -1,12 +1,6 @@
 cmake_minimum_required(VERSION 3.12)
 project(ICM20948Bindings)
 
-# Set pybind11 directory (assuming virtual environment)
-set(pybind11_DIR "/home/raspi/Documents/env/lib/python3.11/site-packages/pybind11/share/cmake/pybind11")
-
-# Find pybind11
-find_package(pybind11 REQUIRED)
-
 # Set output directory for the Python module
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/build)
 
