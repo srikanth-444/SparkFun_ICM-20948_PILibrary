@@ -1,0 +1,3 @@
+/home/raspi/Documents/SparkFun_ICM-20948_PILibrary/build/CMakeFiles/icm20948.dir
+/home/raspi/Documents/SparkFun_ICM-20948_PILibrary/build/CMakeFiles/edit_cache.dir
+/home/raspi/Documents/SparkFun_ICM-20948_PILibrary/build/CMakeFiles/rebuild_cache.dir

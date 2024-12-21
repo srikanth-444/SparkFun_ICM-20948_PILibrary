@@ -1,0 +1,1 @@
+/usr/bin/c++ -fPIC -shared -Wl,-soname,ICM20948.so -o ICM20948.so CMakeFiles/ICM20948.dir/src/ICM_20948.cpp.o CMakeFiles/ICM20948.dir/src/util/ICM_20948_C.c.o CMakeFiles/ICM20948.dir/src/bindings.cpp.o 

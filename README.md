@@ -1,39 +1,31 @@
-# SparkFun ICM-20948 Arduino Library
+# SparkFun ICM-20948 C++ Library
 
-This is the SparkFun library for the TDK InvenSense ICM-20948 Inertial Measurement Unit 9-Degree Of Freedom sensor as used on the [SparkFun 9DoF IMU Breakout - ICM-20948 (Qwiic)](https://www.sparkfun.com/products/15335).
+This is the C++ adaptation of the SparkFun library for the TDK InvenSense ICM-20948 Inertial Measurement Unit, a 9-Degree Of Freedom sensor, as used on the SparkFun 9DoF IMU Breakout - ICM-20948 (Qwiic).
 
-Version 1.2 of the library includes support for the InvenSense Digital Motion Processor (DMP™). You can find further details in [DMP.md](./DMP.md).
-
-## Contributing
-
-If you would like to contribute to this library: please do, we truly appreciate it, but please follow [these guidelines](./CONTRIBUTING.md). Thanks!
+This library includes support for the InvenSense Digital Motion Processor (DMP™) and SPI-based communication in C++ using the Raspberry Pi's `spidev0.0` interface. For further details, see [DMP.md](DMP.md).
 
 ## Repository Contents
 
-* [**/examples**](./examples) - Example sketches for the library (.ino). Run these from the Arduino IDE.
-* [**/src**](./src) - Source files for the library (.cpp, .h).
-* [**keywords.txt**](./keywords.txt) - Keywords from this library that will be highlighted in the Arduino IDE.
-* [**library.properties**](./library.properties) - General library properties for the Arduino package manager.
-* [**CONTRIBUTING.md**](./CONTRIBUTING.md) - Guidelines on how to contribute to this library.
-* [**DMP.md**](./DMP.md) - Information about the InvenSense Digital Motion Processor (DMP™)
+- `/examples` - Example scripts for the library. Run these using C++.
+- `/src` - Source files for the library.
+- `CONTRIBUTING.md` - Guidelines on how to contribute to this library.
+- `DMP.md` - Information about the InvenSense Digital Motion Processor (DMP™).
 
 ## Documentation
 
-* **[Hookup Guide](https://learn.sparkfun.com/tutorials/sparkfun-9dof-imu-icm-20948-breakout-hookup-guide)** - Basic hookup guide for the SparkFun 9DoF IMU Breakout.
-* **[Installing an Arduino Library Guide](https://learn.sparkfun.com/tutorials/installing-an-arduino-library)** - Basic information on how to install an Arduino library.
+- **Hookup Guide**: Basic hookup guide for the SparkFun 9DoF IMU Breakout.
+- **Raspberry Pi Setup**: The library is designed to work with Raspberry Pi using the `spidev0.0` interface for SPI communication. Ensure that SPI is enabled on your Raspberry Pi before using the library.
 
 ## Products that use this Library
 
-* [SparkFun 9DoF IMU Breakout - ICM-20948 (Qwiic) - SEN-15335](https://www.sparkfun.com/products/15335)
-* [SparkFun OpenLog Artemis - DEV-16832](https://www.sparkfun.com/products/16832)
-* [SparkFun MicroMod Asset Tracker Carrier Board - DEV-17272](https://www.sparkfun.com/products/17272)
+- [SparkFun 9DoF IMU Breakout - ICM-20948 (Qwiic)](https://www.sparkfun.com/products/15335)
+- [SparkFun OpenLog Artemis](https://www.sparkfun.com/products/16832)
+- [SparkFun MicroMod Asset Tracker Carrier Board](https://www.sparkfun.com/products/17272)
 
 ## License Information
 
-This product is _**open source**_!
-
-Please see the included [License.md](./License.md) for more information.
+This product is open source! The original Arduino library is provided by SparkFun Electronics. See the included `License.md` for more information.
 
 Distributed as-is; no warranty is given.
 
-- Your friends at SparkFun.
+**Credits**: Full credits to SparkFun Electronics for their original work on the Arduino library. This C++ adaptation has been created to support Raspberry Pi applications with SPI-based communication via the `spidev0.0` interface and is based on their excellent work. This adaptation is an independent project and is not affiliated with SparkFun Electronics.
