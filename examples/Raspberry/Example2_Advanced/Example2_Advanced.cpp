@@ -1,21 +1,20 @@
 /****************************************************************
- * Example1_Basics.cpp
- * Modified by Srikanth Popuri 
- * Original code by Owen Lyke @ SparkFun Electronics
- * Based on SparkFun ICM-20948 library (MIT License)
- * 
- * See LICENSE.md for full licensing information.
+ * Example2_Advanced.ino
+ * ICM 20948 Arduino Library Demo
+ * Shows how to use granular configuration of the ICM 20948
+ * Owen Lyke @ SparkFun Electronics
+ * Original Creation Date: April 17 2019
+ *
+ * Please see License.md for the license information.
+ *
+ * Distributed as-is; no warranty is given.
  ***************************************************************/
+#include "ICM_20948.h" // Click here to get the library: http://librarymanager/All#SparkFun_ICM_20948_IMU
 
-#include "ICM_20948.h"  // Include the SparkFun ICM-20948 IMU library
-
-// Create an instance of the ICM_20948_SPI object for SPI communication
 ICM_20948_SPI myICM; // If using SPI create an ICM_20948_SPI object
 
-
-// Main function
-int main() {
-    bool initialized = false; // Flag to track if the sensor is initialized
+void setup(){
+  bool initialized = false; // Flag to track if the sensor is initialized
 
     // Try initializing the sensor until successful
     while (!initialized) {
@@ -37,28 +36,131 @@ int main() {
             initialized = true;  // If initialized successfully, exit the loop
         }
     }
+}
 
-    // Infinite loop to continuously read and print data
-    while (true) {
-        // Check if data is ready to be read
-        if (myICM.dataReady()) {
-            // Fetch Accelerometer, Gyroscope, Magnetometer, and Temperature data
-            myICM.getAGMT(); // The values are only updated when you call 'getAGMT'
+int main(){
+  setup();
 
-            // Print the scaled sensor data (adjusted based on the scale settings)
-            printScaledAGMT(&myICM);
+  
 
-            // Delay for 30 milliseconds before the next reading
-            usleep(30000);
-        }
-        else {
-            // If data is not ready, print a waiting message and wait
-            std::cout << "Waiting for data" << std::endl;
-            usleep(500000);  // Delay for 500 milliseconds before checking again
-        }
-    }
+  // In this advanced example we'll cover how to do a more fine-grained setup of your sensor
+  std::cout<<"Device connected!"<<std::endl;
 
-    return 0;  // Exit the program (though this part will never be reached)
+  // Here we are doing a SW reset to make sure the device starts in a known state
+  myICM.swReset();
+  if (myICM.status != ICM_20948_Stat_Ok)
+  {
+    std::cout<<"Software Reset returned: ";
+    std::cout<<myICM.statusString()<<std::endl;
+  }
+  usleep(250000);
+
+  // Now wake the sensor up
+  myICM.sleep(false);
+  myICM.lowPower(false);
+
+  // The next few configuration functions accept a bit-mask of sensors for which the settings should be applied.
+
+  // Set Gyro and Accelerometer to a particular sample mode
+  // options: ICM_20948_Sample_Mode_Continuous
+  //          ICM_20948_Sample_Mode_Cycled
+  myICM.setSampleMode((ICM_20948_Internal_Acc | ICM_20948_Internal_Gyr), ICM_20948_Sample_Mode_Continuous);
+  if (myICM.status != ICM_20948_Stat_Ok)
+  {
+    std::cout<<"setSampleMode returned: ";
+    std::cout<<myICM.statusString()<<std::endl;
+  }
+  
+  // Set full scale ranges for both acc and gyr
+  ICM_20948_fss_t myFSS; // This uses a "Full Scale Settings" structure that can contain values for all configurable sensors
+
+  myFSS.a = gpm2; // (ICM_20948_ACCEL_CONFIG_FS_SEL_e)
+                  // gpm2
+                  // gpm4
+                  // gpm8
+                  // gpm16
+
+  myFSS.g = dps250; // (ICM_20948_GYRO_CONFIG_1_FS_SEL_e)
+                    // dps250
+                    // dps500
+                    // dps1000
+                    // dps2000
+
+  myICM.setFullScale((ICM_20948_Internal_Acc | ICM_20948_Internal_Gyr), myFSS);
+  if (myICM.status != ICM_20948_Stat_Ok)
+  {
+    std::cout<<"setFullScale returned: ";
+    std::cout<<myICM.statusString()<<std::endl;
+  }
+
+  // Set up Digital Low-Pass Filter configuration
+  ICM_20948_dlpcfg_t myDLPcfg;    // Similar to FSS, this uses a configuration structure for the desired sensors
+  myDLPcfg.a = acc_d473bw_n499bw; // (ICM_20948_ACCEL_CONFIG_DLPCFG_e)
+                                  // acc_d246bw_n265bw      - means 3db bandwidth is 246 hz and nyquist bandwidth is 265 hz
+                                  // acc_d111bw4_n136bw
+                                  // acc_d50bw4_n68bw8
+                                  // acc_d23bw9_n34bw4
+                                  // acc_d11bw5_n17bw
+                                  // acc_d5bw7_n8bw3        - means 3 db bandwidth is 5.7 hz and nyquist bandwidth is 8.3 hz
+                                  // acc_d473bw_n499bw
+
+  myDLPcfg.g = gyr_d361bw4_n376bw5; // (ICM_20948_GYRO_CONFIG_1_DLPCFG_e)
+                                    // gyr_d196bw6_n229bw8
+                                    // gyr_d151bw8_n187bw6
+                                    // gyr_d119bw5_n154bw3
+                                    // gyr_d51bw2_n73bw3
+                                    // gyr_d23bw9_n35bw9
+                                    // gyr_d11bw6_n17bw8
+                                    // gyr_d5bw7_n8bw9
+                                    // gyr_d361bw4_n376bw5
+
+  myICM.setDLPFcfg((ICM_20948_Internal_Acc | ICM_20948_Internal_Gyr), myDLPcfg);
+  if (myICM.status != ICM_20948_Stat_Ok)
+  {
+    std::cout<<"setDLPcfg returned: ";
+    std::cout<<myICM.statusString()<<std::endl;
+  }
+
+  // Choose whether or not to use DLPF
+  // Here we're also showing another way to access the status values, and that it is OK to supply individual sensor masks to these functions
+  ICM_20948_Status_e accDLPEnableStat = myICM.enableDLPF(ICM_20948_Internal_Acc, false);
+  ICM_20948_Status_e gyrDLPEnableStat = myICM.enableDLPF(ICM_20948_Internal_Gyr, false);
+  std::cout<<"Enable DLPF for Accelerometer returned: ";
+  std::cout<<myICM.statusString(accDLPEnableStat)<<std::endl;
+  std::cout<<"Enable DLPF for Gyroscope returned: ";
+  std::cout<<myICM.statusString(gyrDLPEnableStat)<<std::endl;
+
+  // Choose whether or not to start the magnetometer
+  myICM.startupMagnetometer();
+  if (myICM.status != ICM_20948_Stat_Ok)
+  {
+    std::cout<<"startupMagnetometer returned: ";
+    std::cout<<myICM.statusString()<<std::endl;
+  }
+
+ 
+  std::cout<<"Configuration complete!"<<std::endl;
+}
+
+
+  
+
+
+void loop()
+{
+
+  if (myICM.dataReady())
+  {
+    myICM.getAGMT();              // The values are only updated when you call 'getAGMT'
+    //printRawAGMT( myICM.agmt ); // Uncomment this to see the raw values, taken directly from the agmt structure
+    printScaledAGMT(&myICM);      // This function takes into account the scale settings from when the measurement was made to calculate the values with units
+    usleep(30000);
+  }
+  else
+  {
+    std::cout<<"Waiting for data"<<std::endl;
+    usleep(500000);
+  }
 }
 
 // Helper function to print a 16-bit integer value with leading zeros for alignment
